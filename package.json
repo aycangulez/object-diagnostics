@@ -1,0 +1,21 @@
+{
+    "name": "object-diagnostics",
+    "version": "0.0.1",
+    "description": "",
+    "type": "module",
+    "exports": "./index.js",
+    "scripts": {
+        "test": "mocha",
+        "jsdoc": "jsdoc"
+    },
+    "author": "Aycan Gulez",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/chai": "^5.0.1",
+        "@types/mocha": "^10.0.10",
+        "@types/node": "^22.10.5",
+        "chai": "^5.1.2",
+        "jsdoc": "^4.0.4",
+        "mocha": "^11.0.1"
+    }
+}
