@@ -2,13 +2,7 @@
 
 import { expect } from 'chai';
 import { cloneDeep } from 'lodash-es';
-import ObjectDiagnostics from '../index.js';
-
-function assert(cond, msg = '') {
-    if (!cond) {
-        throw new Error(msg);
-    }
-}
+import { assert, ObjectDiagnostics } from '../index.js';
 
 const SiteOrganizer = function () {
     const siteMap = new Map();
@@ -75,7 +69,7 @@ function generateTestCase() {
 describe('Doing the following will trigger a diagnostics call', function () {
     const errMsg = "Parent site of Regional Office A doesn't exist.";
 
-    it('Calling any method', function () {
+    it('Calling a method', function () {
         const sampleSites = generateTestCase();
         expect(sampleSites.getSite(1)).to.include({ name: 'HQ' });
         sampleSites.getSite(2).parentId = -1;
@@ -91,6 +85,14 @@ describe('Doing the following will trigger a diagnostics call', function () {
     it('Setting a property', function () {
         const sampleSites = generateTestCase();
         sampleSites.getSite(2).parentId = -1;
-        expect(() => (sampleSites.testProperty = 1)).to.throw(errMsg);
+        expect(() => (sampleSites.testProperty = 42)).to.throw(errMsg);
+    });
+
+    it('Deleting a property', function () {
+        const sampleSites = generateTestCase();
+        sampleSites.testProperty = 42;
+        expect(sampleSites.getSite(1)).to.include({ name: 'HQ' });
+        sampleSites.getSite(2).parentId = -1;
+        expect(() => delete sampleSites.testProperty).to.throw(errMsg);
     });
 });

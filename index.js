@@ -1,29 +1,34 @@
 // @ts-check
 
-const nodeEnv = typeof process !== 'undefined' ? process.env.NODE_ENV : '';
+const isDev = (() => {
+    const nodeEnv = typeof process !== 'undefined' ? process.env.NODE_ENV : '';
+    const conditions = [() => nodeEnv !== 'production', () => import.meta.url.match('://localhost')];
+    return !!conditions.find((cond) => cond());
+})();
+
+/**
+ * Throws an exception if the condition is false and the environment is not production
+ * @param {boolean} cond
+ * @param {string} msg
+ */
+function assert(cond, msg = '') {
+    if (isDev && !cond) {
+        throw new Error(msg);
+    }
+}
 
 /**
  * Creates a new diagnostics object
- * @param {{addDiagnostics?: Boolean}} options
  * @returns {Object}
  */
-function ObjectDiagnostics(options = {}) {
+function ObjectDiagnostics() {
     const proxiedObjs = new WeakSet();
     const that = this;
 
     /**
-     * Decides whether diagnostic calls should be added
-     * @returns Boolean
-     */
-    const shouldAddDiagnostics = () => {
-        const conditions = [() => nodeEnv !== 'production', () => import.meta.url.match('://localhost')];
-        return !!conditions.find((cond) => cond());
-    };
-
-    /**
      * Returns true if a value is an object and hasn't already been proxied
      * @param {*} value
-     * @returns Boolean
+     * @returns boolean
      */
     const isNewObject = (value) => value !== null && typeof value === 'object' && !proxiedObjs.has(value);
 
@@ -33,7 +38,7 @@ function ObjectDiagnostics(options = {}) {
      * @returns {Object}
      */
     this.add = function (objToProxy) {
-        if (options.addDiagnostics === false || !shouldAddDiagnostics()) {
+        if (!isDev) {
             return objToProxy;
         }
         // Credit for recursive proxy handling: https://stackoverflow.com/a/40164194
@@ -92,4 +97,4 @@ function ObjectDiagnostics(options = {}) {
     return this;
 }
 
-export default ObjectDiagnostics;
+export { assert, ObjectDiagnostics };
