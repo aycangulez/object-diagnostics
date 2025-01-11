@@ -1,33 +1,40 @@
 // @ts-check
 
 import { expect } from 'chai';
-import { cloneDeep } from 'lodash-es';
 import { assert, ObjectDiagnostics } from '../index.js';
 
 const SiteOrganizer = function () {
     const siteMap = new Map();
 
-    function checkChildren(children) {
-        let status = true;
-        children.forEach((siteId) => siteMap.has(siteId) || (status = false));
-        return status;
-    }
+    this.diagnostics = () => {
+        function checkChildren(children) {
+            let status = true;
+            children.forEach((siteId) => siteMap.has(siteId) || (status = false));
+            return status;
+        }
 
-    function checkInvariants(site) {
-        assert(site.id !== site.parentId, `Site ${site.name} may not be its own parent.`);
-        assert(site.parentId === null || siteMap.has(site.parentId), `Parent site of ${site.name} doesn't exist.`);
-        assert(site.children ? checkChildren(site.children) : true, `Site ${site.name} has invalid children.`);
-    }
+        siteMap.forEach((site) => {
+            assert(site.id !== site.parentId, `Site ${site.name} cannot be its own parent.`);
+            assert(site.parentId === null || siteMap.has(site.parentId), `Parent site of ${site.name} doesn't exist.`);
+            assert(checkChildren(site.children), `Site ${site.name} has invalid children.`);
+        });
+    };
 
     this.addSite = (site) => {
         assert(!siteMap.has(site.id), `Site ${site.name} already exists.`);
-        checkInvariants(site);
+        assert(site.id !== site.parentId, `Site ${site.name} cannot be its own parent.`);
+        assert(site.parentId === null || siteMap.has(site.parentId), `Parent site of ${site.name} doesn't exist.`);
 
-        //siteMap.set(site.id, { ...cloneDeep(site), children: new Set() });
         siteMap.set(site.id, { ...site, children: new Set() });
         if (site.parentId !== null) {
             siteMap.get(site.parentId).children.add(site.id);
         }
+
+        assert(siteMap.has(site.id), `Site ${site.name} wasn't added.`);
+        assert(
+            site.parentId !== null ? siteMap.get(site.parentId).children.has(site.id) : true,
+            `Site ${site.name} wasn't added to parent's children.`
+        );
         return this;
     };
 
@@ -44,19 +51,16 @@ const SiteOrganizer = function () {
     };
 
     this.getSite = (siteId) => {
-        // return cloneDeep(siteMap.get(siteId));
         return siteMap.get(siteId);
     };
 
-    this.diagnostics = () => {
-        siteMap.forEach(checkInvariants);
-    };
+    this.getSites = () => siteMap;
 
     return this;
 };
 
 function generateTestCase() {
-    return new ObjectDiagnostics().add(
+    return new ObjectDiagnostics().addTo(
         new SiteOrganizer()
             .addSite({ id: 1, name: 'HQ', parentId: null })
             .addSite({ id: 2, name: 'Regional Office A', parentId: 1 })
@@ -72,7 +76,7 @@ describe('Doing the following will trigger a diagnostics call', function () {
     it('Calling a method', function () {
         const sampleSites = generateTestCase();
         expect(sampleSites.getSite(1)).to.include({ name: 'HQ' });
-        sampleSites.getSite(2).parentId = -1;
+        sampleSites.getSites().get(2).parentId = 100;
         expect(() => sampleSites.getSite(1)).to.throw(errMsg);
     });
 

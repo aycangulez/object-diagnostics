@@ -37,14 +37,14 @@ function ObjectDiagnostics() {
      * @param {Object} objToProxy
      * @returns {Object}
      */
-    this.add = function (objToProxy) {
+    this.addTo = function (objToProxy) {
         if (!isDev) {
             return objToProxy;
         }
         // Credit for recursive proxy handling: https://stackoverflow.com/a/40164194
         for (let i in objToProxy) {
             if (isNewObject(objToProxy[i])) {
-                objToProxy[i] = this.add(objToProxy[i]);
+                objToProxy[i] = this.addTo(objToProxy[i]);
             }
         }
 
@@ -82,7 +82,7 @@ function ObjectDiagnostics() {
             set: function (target, prop, value) {
                 // Proxy nested objects
                 if (isNewObject(value)) {
-                    value = that.add(value);
+                    value = that.addTo(value);
                 }
                 const returnValue = Reflect.set(target, prop, value);
                 target.diagnostics();
