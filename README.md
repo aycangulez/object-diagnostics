@@ -1,4 +1,4 @@
-**Object Diagnostics** is a JavaScript library that automatically calls a diagnostics method on a object after any operation that could potentially change its state.
+**Object Diagnostics** is a JavaScript library that automatically calls a diagnostics method on an object after any operation that could potentially change its state.
 
 ## Installation
 
