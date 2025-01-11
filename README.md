@@ -1,4 +1,4 @@
-**Object Diagnostics** is a JavaScript library that automatically calls a diagnostics method on an object after any operation that could potentially change its state.
+**Object Diagnostics** is a JavaScript library that can be used to automatically call a diagnostics method on an object after any operation that could potentially change its state.
 
 ## Installation
 
@@ -9,7 +9,7 @@ npm install --save object-diagnostics
 ## Usage
 
 ```js
-import { ObjectDiagnostics, assert } from 'ObjectDiagnostics';
+import { ObjectDiagnostics, assert } from 'object-diagnostics';
 
 const objectWithDiagnostics = new ObjectDiagnostics().addTo(myObj);
 ```
