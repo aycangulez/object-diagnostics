@@ -1,10 +1,6 @@
 // @ts-check
 
-const isDev = (() => {
-    const nodeEnv = typeof process !== 'undefined' ? process.env.NODE_ENV : '';
-    const conditions = [() => nodeEnv !== 'production', () => import.meta.url.match('://localhost')];
-    return !!conditions.find((cond) => cond());
-})();
+const isDev = typeof process !== 'undefined' ? process.env.NODE_ENV !== 'production' : true;
 
 /**
  * Throws an exception if the condition is false and the environment is not production

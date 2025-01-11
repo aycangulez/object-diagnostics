@@ -9,6 +9,7 @@
         "jsdoc": "jsdoc"
     },
     "author": "Aycan Gulez",
+    "homepage": "https://github.com/aycangulez/object-diagnostics",
     "license": "MIT",
     "devDependencies": {
         "@types/chai": "^5.0.1",
