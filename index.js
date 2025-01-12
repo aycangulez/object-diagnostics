@@ -2,6 +2,16 @@
 
 const isDev = typeof process !== 'undefined' ? process.env.NODE_ENV !== 'production' : true;
 
+class AssertionError extends Error {
+    constructor() {
+        super(...arguments);
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, AssertionError);
+        }
+        this.name = 'Assertion failed';
+    }
+}
+
 /**
  * Throws an exception if the condition is false and the environment is not production
  * @param {boolean} cond
@@ -9,7 +19,7 @@ const isDev = typeof process !== 'undefined' ? process.env.NODE_ENV !== 'product
  */
 function assert(cond, msg = '') {
     if (isDev && !cond) {
-        throw new Error(msg);
+        throw new AssertionError(msg);
     }
 }
 

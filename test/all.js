@@ -15,32 +15,32 @@ const SiteOrganizer = function () {
 
         siteMap.forEach((site) => {
             assert(site.id !== site.parentId, `Site ${site.name} cannot be its own parent.`);
-            assert(site.parentId === null || siteMap.has(site.parentId), `Parent site of ${site.name} doesn't exist.`);
-            assert(checkChildren(site.children), `Site ${site.name} has invalid children.`);
+            assert(site.parentId === null || siteMap.has(site.parentId), `Parent site of ${site.name} must exist.`);
+            assert(checkChildren(site.children), `Site ${site.name} must have valid children.`);
         });
     };
 
     this.addSite = (site) => {
-        assert(!siteMap.has(site.id), `Site ${site.name} already exists.`);
+        assert(!siteMap.has(site.id), `Site ${site.name} should not have been added before.`);
         assert(site.id !== site.parentId, `Site ${site.name} cannot be its own parent.`);
-        assert(site.parentId === null || siteMap.has(site.parentId), `Parent site of ${site.name} doesn't exist.`);
+        assert(site.parentId === null || siteMap.has(site.parentId), `Parent site of ${site.name} must exist.`);
 
         siteMap.set(site.id, { ...site, children: new Set() });
         if (site.parentId !== null) {
             siteMap.get(site.parentId).children.add(site.id);
         }
 
-        assert(siteMap.has(site.id), `Site ${site.name} wasn't added.`);
+        assert(siteMap.has(site.id), `Added site ${site.name}.`);
         assert(
             site.parentId !== null ? siteMap.get(site.parentId).children.has(site.id) : true,
-            `Site ${site.name} wasn't added to parent's children.`
+            `Added site ${site.name} as sub site.`
         );
         return this;
     };
 
     this.removeSite = (siteId) => {
-        assert(siteMap.has(siteId), `Site #${siteId} doesn't exist.`);
-        assert(siteMap.get(siteId).children.size === 0, `Site #${siteId} has sub sites.`);
+        assert(siteMap.has(siteId), `Site #${siteId} must exist.`);
+        assert(siteMap.get(siteId).children.size === 0, `Site #${siteId} must have no children.`);
 
         const site = siteMap.get(siteId);
         if (site.parentId !== null) {
@@ -55,8 +55,6 @@ const SiteOrganizer = function () {
     };
 
     this.getSites = () => siteMap;
-
-    return this;
 };
 
 function generateTestCase() {
@@ -71,7 +69,7 @@ function generateTestCase() {
 }
 
 describe('Doing the following will trigger a diagnostics call', function () {
-    const errMsg = "Parent site of Regional Office A doesn't exist.";
+    const errMsg = 'Parent site of Regional Office A must exist.';
 
     it('Calling a method', function () {
         const sampleSites = generateTestCase();
